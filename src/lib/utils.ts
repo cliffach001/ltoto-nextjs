@@ -95,7 +95,7 @@ export async function logActivityToSupabase(
 }
 
 export async function fetchSupabaseData(): Promise<SwitchGearItem[]> {
-  const { data, error } = await supabase.from('lototo_aktif').select('*');
+  const { data, error } = await supabase.from('lototo_aktif').select('*').order('created_at', { ascending: false });
   if (error) {
     console.error('Supabase fetch error:', error);
     return [];
@@ -153,7 +153,8 @@ export async function fetchActivityLogs(): Promise<ActivityLog[]> {
 export async function fetchProfiles(): Promise<Profile[]> {
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, username, full_name, email, role, department, status');
+    .select('id, username, full_name, email, role, department, status')
+    .order('created_at', { ascending: false });
   if (error || !data) {
     console.error('Fetch profiles error:', error);
     return [];
