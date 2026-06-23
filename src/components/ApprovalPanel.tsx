@@ -21,7 +21,7 @@ export default function ApprovalPanel({ onRefresh }: ApprovalPanelProps) {
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const isAdmin = user?.role === 'admin';
+  const isAdminOrManager = ['admin', 'manager'].includes(user?.role || '');
 
   const loadRequests = useCallback(async () => {
     const data = await fetchPendingDeletionRequests();
@@ -29,7 +29,7 @@ export default function ApprovalPanel({ onRefresh }: ApprovalPanelProps) {
   }, []);
 
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!isAdminOrManager) return;
     loadRequests();
 
     // Real-time subscription for new deletion requests
@@ -52,7 +52,7 @@ export default function ApprovalPanel({ onRefresh }: ApprovalPanelProps) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [isAdmin, loadRequests]);
+  }, [isAdminOrManager, loadRequests]);
 
   // Click outside to close dropdown
   useEffect(() => {
@@ -69,7 +69,7 @@ export default function ApprovalPanel({ onRefresh }: ApprovalPanelProps) {
   // Approve deletion
   const handleApprove = async (req: DeletionRequest) => {
     setLoading(true);
-    await updateActivityLogStatus(req.id, 'approved', user?.fullName || 'Admin');
+    await updateActivityLogStatus(req.id, 'approved', user?.fullName || user?.role || 'Admin');
     await deleteSupabaseRecord(req.record_id);
     await loadRequests();
     onRefresh?.();
@@ -79,12 +79,12 @@ export default function ApprovalPanel({ onRefresh }: ApprovalPanelProps) {
   // Reject deletion
   const handleReject = async (req: DeletionRequest) => {
     setLoading(true);
-    await updateActivityLogStatus(req.id, 'rejected', user?.fullName || 'Admin');
+    await updateActivityLogStatus(req.id, 'rejected', user?.fullName || user?.role || 'Admin');
     await loadRequests();
     setLoading(false);
   };
 
-  if (!isAdmin) return null;
+  if (!isAdminOrManager) return null;
 
   return (
     <div ref={dropdownRef} style={{ position: 'relative', display: 'inline-flex' }}>

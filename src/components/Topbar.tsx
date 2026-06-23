@@ -50,7 +50,7 @@ export default function Topbar({ title, subtitle }: TopbarProps) {
         </div>
       </div>
       <div className="topbar-actions">
-        {user?.role === 'admin' && <ApprovalPanel />}
+        {['admin', 'manager'].includes(user?.role || '') && <ApprovalPanel />}
         <button
           id="themeToggle"
           className="icon-btn"

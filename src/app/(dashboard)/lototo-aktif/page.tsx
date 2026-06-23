@@ -170,8 +170,8 @@ export default function LototoAktifPage() {
   const handleDelete = async (item: SwitchGearItem) => {
     const recordId = item.supabase_id || item.id;
 
-    // Admin: direct delete
-    if (user?.role === 'admin') {
+    // Admin & Manager: direct delete
+    if (['admin', 'manager'].includes(user?.role || '')) {
       if (!window.confirm(`Apakah Anda yakin ingin menghapus "${item.name}"? Tindakan ini tidak dapat dibatalkan.`)) {
         return;
       }
@@ -186,11 +186,11 @@ export default function LototoAktifPage() {
     }
 
     // Operator: request deletion approval
-    const confirmMsg = `Kirim permintaan penghapusan "${item.name}" ke admin?`;
+    const confirmMsg = `Kirim permintaan penghapusan "${item.name}" ke admin/manager?`;
     if (!window.confirm(confirmMsg)) return;
     const result = await createDeletionRequest(recordId, item.name, user?.fullName || 'Operator');
     if (result) {
-      setFeedbackMessage(`Permintaan penghapusan "${item.name}" telah dikirim ke admin untuk disetujui.`);
+      setFeedbackMessage(`Permintaan penghapusan "${item.name}" telah dikirim ke admin/manager untuk disetujui.`);
       setIsError(false);
     } else {
       setFeedbackMessage('Gagal mengirim permintaan. Silakan coba lagi.');
