@@ -37,15 +37,34 @@ export default function LototoAktifPage() {
   const [inputLokasi, setInputLokasi] = useState('');
   const [inputPIC, setInputPIC] = useState('');
   const [inputWaktu, setInputWaktu] = useState('');
+  const [inputNotif, setInputNotif] = useState('');
+  const [inputLototo, setInputLototo] = useState('');
+  const [inputPeminta, setInputPeminta] = useState('');
+  const [inputKeterangan, setInputKeterangan] = useState('');
+  const [inputGambar, setInputGambar] = useState('');
 
   // Edit form state
   const [editLokasi, setEditLokasi] = useState('');
   const [editPIC, setEditPIC] = useState('');
   const [editWaktu, setEditWaktu] = useState('');
   const [editStatus, setEditStatus] = useState<Status>('lototo');
+  const [editNotif, setEditNotif] = useState('');
+  const [editLototo, setEditLototo] = useState('');
+  const [editPeminta, setEditPeminta] = useState('');
+  const [editKeterangan, setEditKeterangan] = useState('');
+  const [editGambar, setEditGambar] = useState('');
 
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [isError, setIsError] = useState(false);
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
 
   const refreshData = useCallback(async () => {
     const result = await fetchSupabaseData();
@@ -77,6 +96,11 @@ export default function LototoAktifPage() {
     setInputLokasi('');
     setInputPIC('');
     setInputWaktu(new Date().toISOString().slice(0, 16));
+    setInputNotif('');
+    setInputLototo('');
+    setInputPeminta('');
+    setInputKeterangan('');
+    setInputGambar('');
     setFeedbackMessage('');
     setIsError(false);
   };
@@ -92,6 +116,11 @@ export default function LototoAktifPage() {
     setEditPIC(item.pic);
     setEditWaktu(item.time ? formatToDatetimeLocal(item.time) : new Date().toISOString().slice(0, 16));
     setEditStatus(item.status);
+    setEditNotif(item.no_notif);
+    setEditLototo(item.no_lototo);
+    setEditPeminta(item.peminta);
+    setEditKeterangan(item.keterangan);
+    setEditGambar(item.gambar);
     setFeedbackMessage('');
     setIsError(false);
     setIsEditModalOpen(true);
@@ -114,6 +143,11 @@ export default function LototoAktifPage() {
       pic,
       time: now,
       status: 'lototo',
+      no_notif: inputNotif,
+      no_lototo: inputLototo,
+      peminta: inputPeminta,
+      keterangan: inputKeterangan,
+      gambar: inputGambar,
     });
 
     if (newRecord) {
@@ -182,6 +216,11 @@ export default function LototoAktifPage() {
       pic,
       time: now,
       status: editStatus,
+      no_notif: editNotif,
+      no_lototo: editLototo,
+      peminta: editPeminta,
+      keterangan: editKeterangan,
+      gambar: editGambar,
     });
 
     if (updatedRecord) {
@@ -204,6 +243,28 @@ export default function LototoAktifPage() {
   const lototoData = data.filter((d) => d.status === 'lototo');
   const maintenanceCount = data.filter((d) => d.status === 'maintenance').length;
   const remainingCount = data.filter((d) => d.status === 'normal').length;
+
+  const sendWhatsApp = (item: SwitchGearItem) => {
+    const message = [
+      '📋 *LAPORAN LOTOTO AKTIF*',
+      '═══════════════════════',
+      `*Switch Gear:* ${item.name}`,
+      `*Unit:* ${item.unit}`,
+      `*Lokasi:* ${item.location}`,
+      `*PIC:* ${item.pic}`,
+      `*Waktu Aktif:* ${item.time}`,
+      `*No. Notif:* ${item.no_notif || '-'}`,
+      `*No. Lototo:* ${item.no_lototo || '-'}`,
+      `*Peminta:* ${item.peminta || '-'}`,
+      `*Status:* ${STATUS_LABELS[item.status].label}`,
+      `*Keterangan:* ${item.keterangan || '-'}`,
+      '═══════════════════════',
+      `Dikirim: ${new Date().toLocaleString('id-ID')}`,
+    ].join('\n');
+
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, '_blank');
+  };
 
   const handleExportPDF = useCallback(() => {
     const doc = new jsPDF('landscape', 'mm', 'a4');
@@ -312,13 +373,14 @@ export default function LototoAktifPage() {
               <th>PIC</th>
               <th>Waktu Aktif</th>
               <th>Status</th>
+              <th>WhatsApp</th>
               {canEdit && <th>Aksi</th>}
             </tr>
           </thead>
           <tbody>
             {lototoData.length === 0 ? (
               <tr>
-                <td colSpan={canEdit ? 7 : 6} style={{ textAlign: 'center', color: '#94a3b8', padding: '30px' }}>
+                <td colSpan={canEdit ? 8 : 7} style={{ textAlign: 'center', color: '#94a3b8', padding: '30px' }}>
                   'Memuat data...'
                 </td>
               </tr>
@@ -334,6 +396,15 @@ export default function LototoAktifPage() {
                     <td data-label="Waktu Aktif">{item.time}</td>
                     <td data-label="Status">
                       <span className={`badge ${status.className}`}>{status.label}</span>
+                    </td>
+                    <td data-label="WhatsApp">
+                      <button
+                        className="button secondary"
+                        onClick={() => sendWhatsApp(item)}
+                        style={{ background: '#25D366', color: '#fff', border: 'none' }}
+                      >
+                        <i className="fa-brands fa-whatsapp"></i> Kirim
+                      </button>
                     </td>
                     {canEdit && (
                       <td data-label="Aksi">
@@ -414,6 +485,70 @@ export default function LototoAktifPage() {
             value={inputWaktu}
             onChange={(e) => setInputWaktu(e.target.value)}
           />
+        </div>
+        <div className="form-row">
+          <label htmlFor="inputNotif">No. Notif</label>
+          <input
+            id="inputNotif"
+            type="text"
+            value={inputNotif}
+            onChange={(e) => setInputNotif(e.target.value)}
+            placeholder="Masukkan nomor notif"
+          />
+        </div>
+        <div className="form-row">
+          <label htmlFor="inputLototo">No. Lototo</label>
+          <input
+            id="inputLototo"
+            type="text"
+            value={inputLototo}
+            onChange={(e) => setInputLototo(e.target.value)}
+            placeholder="Masukkan nomor LOTOTO"
+          />
+        </div>
+        <div className="form-row">
+          <label htmlFor="inputPeminta">Peminta</label>
+          <input
+            id="inputPeminta"
+            type="text"
+            value={inputPeminta}
+            onChange={(e) => setInputPeminta(e.target.value)}
+            placeholder="Masukkan nama peminta"
+          />
+        </div>
+        <div className="form-row">
+          <label htmlFor="inputKeterangan">Keterangan</label>
+          <textarea
+            id="inputKeterangan"
+            value={inputKeterangan}
+            onChange={(e) => setInputKeterangan(e.target.value)}
+            placeholder="Masukkan keterangan"
+            rows={3}
+          />
+        </div>
+        <div className="form-row">
+          <label htmlFor="inputGambar">Gambar</label>
+          <input
+            id="inputGambar"
+            type="file"
+            accept="image/*"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const base64 = await fileToBase64(file);
+                setInputGambar(base64);
+              }
+            }}
+          />
+          {inputGambar && (
+            <div style={{ marginTop: 8 }}>
+              <img
+                src={inputGambar}
+                alt="Preview"
+                style={{ maxWidth: '100%', maxHeight: 160, borderRadius: 8, objectFit: 'cover' }}
+              />
+            </div>
+          )}
         </div>
         {feedbackMessage && (
           <div className={`feedback-message is-visible ${isError ? 'error' : ''}`}>
@@ -497,6 +632,70 @@ export default function LototoAktifPage() {
             <option value="maintenance">Maintenance</option>
             <option value="normal">Selesai</option>
           </select>
+        </div>
+        <div className="form-row">
+          <label htmlFor="editNotif">No. Notif</label>
+          <input
+            id="editNotif"
+            type="text"
+            value={editNotif}
+            onChange={(e) => setEditNotif(e.target.value)}
+            placeholder="Masukkan nomor notif"
+          />
+        </div>
+        <div className="form-row">
+          <label htmlFor="editLototo">No. Lototo</label>
+          <input
+            id="editLototo"
+            type="text"
+            value={editLototo}
+            onChange={(e) => setEditLototo(e.target.value)}
+            placeholder="Masukkan nomor LOTOTO"
+          />
+        </div>
+        <div className="form-row">
+          <label htmlFor="editPeminta">Peminta</label>
+          <input
+            id="editPeminta"
+            type="text"
+            value={editPeminta}
+            onChange={(e) => setEditPeminta(e.target.value)}
+            placeholder="Masukkan nama peminta"
+          />
+        </div>
+        <div className="form-row">
+          <label htmlFor="editKeterangan">Keterangan</label>
+          <textarea
+            id="editKeterangan"
+            value={editKeterangan}
+            onChange={(e) => setEditKeterangan(e.target.value)}
+            placeholder="Masukkan keterangan"
+            rows={3}
+          />
+        </div>
+        <div className="form-row">
+          <label htmlFor="editGambar">Gambar</label>
+          <input
+            id="editGambar"
+            type="file"
+            accept="image/*"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                const base64 = await fileToBase64(file);
+                setEditGambar(base64);
+              }
+            }}
+          />
+          {editGambar && (
+            <div style={{ marginTop: 8 }}>
+              <img
+                src={editGambar}
+                alt="Preview"
+                style={{ maxWidth: '100%', maxHeight: 160, borderRadius: 8, objectFit: 'cover' }}
+              />
+            </div>
+          )}
         </div>
         {feedbackMessage && (
           <div className={`feedback-message is-visible ${isError ? 'error' : ''}`}>

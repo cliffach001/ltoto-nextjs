@@ -12,6 +12,11 @@ export interface SwitchGearItem {
   status: Status;
   pic: string;
   time: string;
+  no_notif: string;
+  no_lototo: string;
+  peminta: string;
+  keterangan: string;
+  gambar: string;
 }
 
 export interface ActivityLog {

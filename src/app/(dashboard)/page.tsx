@@ -42,6 +42,8 @@ export default function DashboardPage() {
   const maintenanceCount = data.filter((d) => d.status === 'maintenance').length;
   const completeCount = data.filter((d) => d.status === 'normal').length;
 
+  const lototoItems = data.filter((d) => d.status === 'lototo');
+
   return (
     <>
       <Topbar title="Dashboard LOTOTO K3" subtitle="Monitoring pengamanan switch gear dan status LOTOTO pra maintenance." />
@@ -72,6 +74,45 @@ export default function DashboardPage() {
         complete={completeCount}
       />
 
+      {/* Single Line Diagram - hanya menampilkan switch gear status LOTOTO */}
+      <section className="sld-panel">
+        <h2 className="panel-title">
+          <i className="fa-solid fa-diagram-project" style={{ marginRight: 10 }}></i>
+          Single Line Diagram Switch Gear
+        </h2>
+        {lototoItems.length === 0 ? (
+          <div className="sld-empty">Tidak ada switch gear dengan status LOTOTO aktif.</div>
+        ) : (
+          <>
+            <div className="busbar"></div>
+            <div className="sld-container">
+              {lototoItems.map((item) => (
+                <div key={item.idIndex} className="switchgear lototo">
+                  <div className="breaker"></div>
+                  <div className="sg-name">{item.name}</div>
+                  <div className="unit-name">{item.unit}</div>
+                  <div className="sg-detail">
+                    <div className="detail-item">
+                      <strong>Lokasi</strong>
+                      {item.location}
+                    </div>
+                    <div className="detail-item">
+                      <strong>PIC</strong>
+                      {item.pic}
+                    </div>
+                    <div className="detail-item">
+                      <strong>Status</strong>
+                      <span className={`badge ${STATUS_LABELS[item.status].className}`} style={{ marginTop: 4, display: 'inline-block' }}>
+                        {STATUS_LABELS[item.status].label}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </section>
 
       {/* Status Table */}
       <section className="table-section">

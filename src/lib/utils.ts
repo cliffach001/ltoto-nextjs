@@ -110,6 +110,11 @@ export async function fetchSupabaseData(): Promise<SwitchGearItem[]> {
     status: normalizeStatus((item.status as string) || null),
     pic: (item.pic as string) || '',
     time: item.time ? formatFromISOString(item.time as string) : '',
+    no_notif: (item.no_notif as string) || '',
+    no_lototo: (item.no_lototo as string) || '',
+    peminta: (item.peminta as string) || '',
+    keterangan: (item.keterangan as string) || '',
+    gambar: (item.gambar as string) || '',
   }));
 }
 
