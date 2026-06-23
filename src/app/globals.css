@@ -756,6 +756,10 @@ body {
   background: #64748b;
 }
 
+.badge.blue {
+  background: #3b82f6;
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;

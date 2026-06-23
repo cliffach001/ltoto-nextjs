@@ -85,8 +85,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const role = user?.role || '';
   const canManageUsers = role === 'admin';
-  const canEdit = ['admin', 'operator'].includes(role);
-  const canCreate = ['admin', 'operator'].includes(role);
+  const canEdit = ['admin', 'manager', 'operator'].includes(role);
+  const canCreate = ['admin', 'manager', 'operator'].includes(role);
 
   return (
     <AuthContext.Provider

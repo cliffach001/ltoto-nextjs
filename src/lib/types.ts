@@ -64,11 +64,11 @@ export const STATUS_BADGE_CLASS: Record<string, string> = {
 };
 
 export const PAGE_ROLE_ACCESS: Record<string, string[]> = {
-  dashboard: ['admin', 'operator', 'viewer'],
-  'lototo-aktif': ['admin', 'operator', 'viewer'],
-  maintenance: ['admin', 'operator', 'viewer'],
-  'switch-gear': ['admin', 'operator', 'viewer'],
-  laporan: ['admin', 'operator', 'viewer'],
+  dashboard: ['admin', 'manager', 'operator', 'viewer'],
+  'lototo-aktif': ['admin', 'manager', 'operator', 'viewer'],
+  maintenance: ['admin', 'manager', 'operator', 'viewer'],
+  'switch-gear': ['admin', 'manager', 'operator', 'viewer'],
+  laporan: ['admin', 'manager', 'operator', 'viewer'],
   pengguna: ['admin'],
 };
 

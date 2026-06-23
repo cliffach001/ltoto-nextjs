@@ -154,6 +154,8 @@ export default function PenggunaPage() {
     switch (role) {
       case 'admin':
         return 'badge red';
+      case 'manager':
+        return 'badge blue';
       case 'operator':
         return 'badge yellow';
       case 'viewer':
@@ -193,6 +195,8 @@ export default function PenggunaPage() {
     switch (role) {
       case 'admin':
         return 'Admin';
+      case 'manager':
+        return 'Manager';
       case 'operator':
         return 'Operator';
       case 'viewer':
@@ -403,6 +407,7 @@ export default function PenggunaPage() {
                 <label htmlFor="role">Role</label>
                 <select id="role" name="role" value={formData.role} onChange={handleChange}>
                   <option value="operator">Operator</option>
+                  <option value="manager">Manager</option>
                   <option value="admin">Admin</option>
                   <option value="viewer">Viewer</option>
                 </select>
