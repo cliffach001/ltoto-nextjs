@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Topbar from '@/components/Topbar';
-import SupabaseBanner from '@/components/SupabaseBanner';
 import { useAuth } from '@/context/AuthContext';
 import Modal from '@/components/Modal';
 import jsPDF from 'jspdf';
@@ -26,8 +25,6 @@ export default function LototoAktifPage() {
   const router = useRouter();
 
   const [data, setData] = useState<SwitchGearItem[]>([]);
-  const [connectionMsg, setConnectionMsg] = useState('Menghubungkan ke Supabase...');
-  const [isConnected, setIsConnected] = useState(false);
   const [lastUpdate, setLastUpdate] = useState('');
 
   const [isInputModalOpen, setIsInputModalOpen] = useState(false);
@@ -51,17 +48,10 @@ export default function LototoAktifPage() {
   const [isError, setIsError] = useState(false);
 
   const refreshData = useCallback(async () => {
-    setConnectionMsg('Menghubungkan ke Supabase...');
-    setIsConnected(false);
     const result = await fetchSupabaseData();
     if (result) {
       setData(result);
-      setConnectionMsg(`Supabase terhubung (${result.length} row)`);
-      setIsConnected(true);
       setLastUpdate(new Date().toLocaleString('id-ID'));
-    } else {
-      setConnectionMsg('Gagal mengambil data dari Supabase');
-      setIsConnected(false);
     }
   }, []);
 
@@ -275,7 +265,6 @@ export default function LototoAktifPage() {
         title="LOTOTO Aktif"
         subtitle="Daftar switch gear yang saat ini dalam status pengamanan LOTOTO."
       />
-      <SupabaseBanner message={connectionMsg} isConnected={isConnected} />
 
       <section className="cards">
         <div className="card active-card">
@@ -330,7 +319,7 @@ export default function LototoAktifPage() {
             {lototoData.length === 0 ? (
               <tr>
                 <td colSpan={canEdit ? 7 : 6} style={{ textAlign: 'center', color: '#94a3b8', padding: '30px' }}>
-                  {connectionMsg.includes('terhubung') ? 'Tidak ada data LOTOTO aktif.' : 'Memuat data...'}
+                  'Memuat data...'
                 </td>
               </tr>
             ) : (

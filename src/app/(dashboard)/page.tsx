@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Topbar from '@/components/Topbar';
-import SupabaseBanner from '@/components/SupabaseBanner';
 import StatusChart from '@/components/StatusChart';
 import { useAuth } from '@/context/AuthContext';
 import { fetchSupabaseData } from '@/lib/utils';
@@ -15,20 +14,11 @@ export default function DashboardPage() {
   const { isLoading, canEdit } = useAuth();
   const router = useRouter();
   const [data, setData] = useState<SwitchGearItem[]>([]);
-  const [connectionMsg, setConnectionMsg] = useState('Menghubungkan ke Supabase...');
-  const [isConnected, setIsConnected] = useState(false);
 
   const refreshData = useCallback(async () => {
-    setConnectionMsg('Menghubungkan ke Supabase...');
-    setIsConnected(false);
     const result = await fetchSupabaseData();
     if (result) {
       setData(result);
-      setConnectionMsg(`Supabase terhubung (${result.length} row)`);
-      setIsConnected(true);
-    } else {
-      setConnectionMsg('Gagal mengambil data dari Supabase');
-      setIsConnected(false);
     }
   }, []);
 
@@ -55,7 +45,6 @@ export default function DashboardPage() {
   return (
     <>
       <Topbar title="Dashboard LOTOTO K3" subtitle="Monitoring pengamanan switch gear dan status LOTOTO pra maintenance." />
-      <SupabaseBanner message={connectionMsg} isConnected={isConnected} />
 
       <section className="cards">
         <div className="card" onClick={() => router.push('/switch-gear')} style={{ cursor: 'pointer' }}>
@@ -111,7 +100,7 @@ export default function DashboardPage() {
             {data.length === 0 ? (
               <tr>
                 <td colSpan={canEdit ? 7 : 6} style={{ textAlign: 'center', color: '#94a3b8', padding: '30px' }}>
-                  {connectionMsg.includes('terhubung') ? 'Tidak ada data' : 'Memuat data...'}
+                  'Memuat data...'
                 </td>
               </tr>
             ) : (
